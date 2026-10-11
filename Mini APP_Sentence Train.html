@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Train - Kids English Game</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for child-friendly typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes puff {
+            0% { transform: scale(0.4) translateY(0) opacity(0.8); }
+            100% { transform: scale(1.5) translateY(-25px) opacity(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(250, 204, 21, 0.9); }
+        }
+
+        @keyframes train-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .animate-train {
+            animation: train-bounce 0.6s ease-in-out infinite;
+        }
+
+        .steam-cloud {
+            animation: puff 2s infinite ease-out;
+        }
+
+        /* Custom scrollbar for horizontal train slots on mobile */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Card interactive styles */
+        .word-card {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            touch-action: manipulation;
+        }
+
+        .word-card:hover {
+            transform: translateY(-3px) scale(1.03);
+        }
+
+        .word-card:active {
+            transform: translateY(1px) scale(0.97);
+        }
+
+        .railroad-track {
+            background: repeating-linear-gradient(
+                90deg,
+                #78350f 0px,
+                #78350f 12px,
+                transparent 12px,
+                transparent 32px
+            );
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen overflow-x-hidden">
+
+    <!-- Top Bar with Title & Sound Toggle -->
+    <header class="w-full bg-sky-500 text-white shadow-lg py-3 px-4 sm:px-8 flex justify-between items-center relative z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-sky-900 font-black text-xl shadow-inner">
+                <i class="fa-solid fa-train"></i>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-wide drop-shadow-md">Sentence Train</h1>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <button id="soundToggleBtn" onclick="toggleSound()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-2 rounded-xl transition flex items-center gap-2 shadow-sm text-sm sm:text-base">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-yellow-300"></i>
+                <span id="soundText" class="hidden sm:inline">Sound ON</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-between relative">
+
+        <!-- SCREEN 1: START SCREEN -->
+        <div id="startScreen" class="flex-1 flex flex-col items-center justify-center text-center py-6">
+            <div class="bg-white/80 backdrop-blur-md border-4 border-sky-300 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-xl w-full flex flex-col items-center relative">
+                
+                <!-- Train Locomotive Banner Graphic -->
+                <div class="relative w-48 h-32 mb-4 animate-float">
+                    <svg viewBox="0 0 200 120" class="w-full h-full drop-shadow-md">
+                        <!-- Steam -->
+                        <circle cx="45" cy="25" r="8" fill="#e0f2fe" class="steam-cloud" />
+                        <circle cx="35" cy="15" r="12" fill="#e0f2fe" class="steam-cloud" style="animation-delay: 0.5s;" />
+                        <!-- Chimney -->
+                        <rect x="50" y="35" width="16" height="25" fill="#e11d48" rx="2" />
+                        <!-- Engine Body -->
+                        <rect x="30" y="55" width="130" height="50" fill="#2563eb" rx="10" />
+                        <rect x="110" y="30" width="50" height="75" fill="#dc2626" rx="8" />
+                        <rect x="118" y="40" width="34" height="25" fill="#fef08a" rx="4" />
+                        <!-- Front Grill -->
+                        <polygon points="30,70 10,100 30,100" fill="#fbbf24" />
+                        <!-- Wheels -->
+                        <circle cx="50" cy="105" r="14" fill="#1e293b" stroke="#94a3b8" stroke-width="4" />
+                        <circle cx="90" cy="105" r="14" fill="#1e293b" stroke="#94a3b8" stroke-width="4" />
+                        <circle cx="135" cy="105" r="16" fill="#1e293b" stroke="#94a3b8" stroke-width="4" />
+                        <!-- Headlight -->
+                        <circle cx="30" cy="70" r="6" fill="#facc15" />
+                    </svg>
+                </div>
+
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-sky-900 mb-2">Welcome Aboard!</h2>
+                <p class="text-slate-600 font-semibold mb-6 text-base sm:text-lg leading-relaxed">
+                    Build English sentences by arranging word cards in the correct order. Drive your train through 10 stations to reach the final destination!
+                </p>
+
+                <!-- Instruction Box -->
+                <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 mb-8 w-full text-left flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-amber-500 text-xl mt-1"></i>
+                    <p class="text-sm sm:text-base text-amber-900 font-medium">
+                        "Click the word cards in the correct order to complete each sentence. Complete all the sentences to help the train reach its destination!"
+                    </p>
+                </div>
+
+                <!-- Big Start Button -->
+                <button onclick="startGame()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-black text-2xl rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 border-b-4 border-emerald-700">
+                    <i class="fa-solid fa-play"></i> START GAME
+                </button>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN (Hidden initially) -->
+        <div id="gameScreen" class="hidden flex-1 flex flex-col gap-4">
+            
+            <!-- Top Controls Dashboard: Stopwatch & Station Progress Bar -->
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-md border-2 border-sky-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                
+                <!-- Stopwatch -->
+                <div class="flex items-center gap-3 bg-sky-100 border border-sky-300 px-4 py-2 rounded-xl">
+                    <i class="fa-solid fa-stopwatch text-sky-600 text-xl animate-pulse"></i>
+                    <div>
+                        <span class="text-xs uppercase font-extrabold text-sky-600 block leading-none">Time Elapsed</span>
+                        <span id="timerDisplay" class="text-2xl font-black text-sky-900 font-mono">00:00</span>
+                    </div>
+                </div>
+
+                <!-- Station Progress Tracker -->
+                <div class="flex-1 w-full sm:w-auto flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-xs font-black text-slate-600">
+                        <span id="stationProgressText"><i class="fa-solid fa-train-subway text-emerald-600"></i> Station 1 of 10</span>
+                        <span id="progressPercent" class="text-emerald-700 font-extrabold">10%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-300">
+                        <div id="progressBar" class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-500" style="width: 10%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instruction Banner -->
+            <div class="bg-amber-100/90 border border-amber-300 text-amber-900 px-4 py-2.5 rounded-xl text-center text-xs sm:text-sm font-bold shadow-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                <span>Click the word cards in the correct order to complete the sentence!</span>
+            </div>
+
+            <!-- Track Visualizer & Station Banner -->
+            <div class="relative w-full bg-gradient-to-b from-sky-200 to-emerald-100 rounded-2xl p-4 border-2 border-sky-300 overflow-hidden shadow-inner min-h-[220px] flex flex-col justify-between">
+                
+                <!-- Station Title Flag -->
+                <div class="flex justify-between items-center mb-2 z-10">
+                    <div class="bg-white/90 px-3 py-1 rounded-lg border border-sky-300 shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-flag-checkered text-rose-500"></i>
+                        <span id="stationNameLabel" class="font-extrabold text-sky-900 text-sm">Station #1</span>
+                    </div>
+                    <div id="feedbackBadge" class="hidden font-bold text-xs sm:text-sm px-3 py-1 rounded-lg shadow-sm transition"></div>
+                </div>
+
+                <!-- Train Carriages with Empty Word Slots -->
+                <div class="relative my-auto z-10 py-2">
+                    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-3 pt-1 px-2" id="trainSlotsContainer">
+                        <!-- Engine Front Graphic -->
+                        <div class="shrink-0 flex items-end mr-1 animate-train">
+                            <svg viewBox="0 0 100 80" class="w-16 h-14 drop-shadow">
+                                <rect x="20" y="20" width="70" height="40" fill="#2563eb" rx="6" />
+                                <rect x="65" y="5" width="25" height="55" fill="#dc2626" rx="4" />
+                                <rect x="70" y="12" width="15" height="18" fill="#fef08a" rx="2" />
+                                <rect x="30" y="8" width="10" height="15" fill="#e11d48" rx="2" />
+                                <circle cx="35" cy="62" r="10" fill="#1e293b" stroke="#cbd5e1" stroke-width="2" />
+                                <circle cx="75" cy="62" r="10" fill="#1e293b" stroke="#cbd5e1" stroke-width="2" />
+                                <circle cx="15" cy="35" r="5" fill="#facc15" />
+                            </svg>
+                        </div>
+
+                        <!-- Slots generated dynamically here -->
+                    </div>
+                </div>
+
+                <!-- Railroad Tracks Graphic at bottom of box -->
+                <div class="w-full h-4 railroad-track border-t-2 border-b-2 border-amber-900/60 rounded-sm"></div>
+            </div>
+
+            <!-- Available Word Cards Pool -->
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-6 shadow-md border-2 border-sky-200 flex-1 flex flex-col justify-center">
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 text-center flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hand-pointer text-sky-500"></i> Available Word Cards (Click to add to train)
+                </div>
+
+                <!-- Flex Container for Shuffled Word Cards -->
+                <div id="wordCardsContainer" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 min-h-[100px]">
+                    <!-- Word cards populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Action Controls: Reset Sentence Button -->
+            <div class="flex justify-between items-center px-1">
+                <button onclick="resetCurrentSentence()" class="text-xs sm:text-sm font-bold text-slate-600 hover:text-rose-600 bg-white/80 hover:bg-rose-50 px-3 py-2 rounded-xl border border-slate-300 hover:border-rose-300 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-rotate-left"></i> Clear Train Slots
+                </button>
+                <div class="text-xs text-slate-500 font-semibold">
+                    <span id="wordsPlacedCount">0</span> / <span id="totalWordsCount">0</span> words placed
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SCREEN 4: GAME COMPLETED / ARRIVED SCREEN -->
+        <div id="finishScreen" class="hidden flex-1 flex flex-col items-center justify-center text-center py-6">
+            <!-- Confetti Canvas overlay inside screen -->
+            <canvas id="confettiCanvas" class="absolute inset-0 pointer-events-none z-30 w-full h-full"></canvas>
+
+            <div class="bg-white/90 backdrop-blur-md border-4 border-yellow-400 rounded-3xl p-6 sm:p-10 shadow-2xl max-w-lg w-full flex flex-col items-center relative z-20">
+                
+                <!-- Celebratory Station Sign -->
+                <div class="bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 text-white font-black text-3xl sm:text-4xl px-8 py-3 rounded-2xl shadow-lg border-4 border-white transform -rotate-1 mb-6 animate-bounce">
+                    🎉 ARRIVED! 🎉
+                </div>
+
+                <!-- Conductor Animation Graphic -->
+                <div class="w-32 h-32 mb-4 relative flex items-center justify-center">
+                    <div class="absolute inset-0 bg-yellow-200 rounded-full animate-ping opacity-30"></div>
+                    <svg viewBox="0 0 120 120" class="w-28 h-28 drop-shadow-lg">
+                        <!-- Station Master Hat -->
+                        <circle cx="60" cy="65" r="35" fill="#fde047" />
+                        <circle cx="60" cy="60" r="28" fill="#1e3a8a" />
+                        <path d="M35 55 Q60 45 85 55" stroke="#fbbf24" stroke-width="4" fill="none" />
+                        <!-- Face -->
+                        <circle cx="60" cy="75" r="22" fill="#fde047" />
+                        <!-- Eyes -->
+                        <circle cx="52" cy="72" r="3" fill="#1e293b" />
+                        <circle cx="68" cy="72" r="3" fill="#1e293b" />
+                        <!-- Smile -->
+                        <path d="M52 82 Q60 90 68 82" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round" />
+                        <!-- Conductor Cap Badge -->
+                        <polygon points="60,42 65,50 55,50" fill="#facc15" />
+                    </svg>
+                </div>
+
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-sky-950 mb-2">Grand Destination Reached!</h3>
+                <p class="text-slate-600 font-bold text-sm sm:text-base mb-6">
+                    Congratulations! You completed all 10 sentences!
+                </p>
+
+                <!-- Final Time Card -->
+                <div class="bg-sky-50 border-2 border-sky-300 rounded-2xl p-4 w-full mb-8 flex items-center justify-around shadow-inner">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-trophy text-amber-500 text-3xl"></i>
+                        <div class="text-left">
+                            <span class="text-xs uppercase font-extrabold text-sky-600 block">Total Time</span>
+                            <span id="finalTimeDisplay" class="text-2xl font-black text-sky-950 font-mono">00:00</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs uppercase font-extrabold text-emerald-600 block">Sentences</span>
+                        <span class="text-2xl font-black text-emerald-700">10 / 10</span>
+                    </div>
+                </div>
+
+                <!-- Play Again Button -->
+                <button onclick="startGame()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-black text-xl rounded-2xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 border-b-4 border-blue-800">
+                    <i class="fa-solid fa-rotate-right"></i> PLAY AGAIN
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-3 text-center text-xs font-semibold text-sky-800/70 border-t border-sky-200/50 mt-auto">
+        Sentence Train &bull; Fun English Learning Mini App
+    </footer>
+
+    <script>
+        /*
+         * SENTENCE BANK - Exactly the 10 specified sentences.
+         */
+        const ORIGINAL_SENTENCES = [
+            "I play soccer with my friends after school.",
+            "He reads a funny book before going to bed.",
+            "She likes to eat ice cream on sunny days.",
+            "Tony and Jenny watch cartoons together on Sundays.",
+            "We study English and sing songs in our classroom.",
+            "Do you walk to school with your best friend?",
+            "Does he help his mother in the kitchen every day?",
+            "Does Jenny play the piano after dinner?",
+            "Do they go to the park and play games on weekends?",
+            "Does your brother like to read books about animals?"
+        ];
+
+        // Application State
+        let gameActive = false;
+        let sentenceQueue = [];
+        let currentSentenceIndex = 0; // 0 to 9
+        let currentSentenceText = "";
+        let originalWords = []; // Array of word strings
+        let shuffledCards = []; // Array of objects { id, text, originalIdx }
+        let selectedTrainCards = []; // Array of card objects currently placed in train slots
+        
+        // Timer Variables
+        let startTime = null;
+        let timerInterval = null;
+        let elapsedSeconds = 0;
+
+        // Sound Settings & Web Audio Synthesizer
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        /**
+         * Initialize Audio Context on first user interaction
+         */
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        /**
+         * Web Audio Synthesizer Sound Effects
+         */
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                // Short cheerful pop
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(350, now);
+                osc.frequency.exponentialRampToValueAtTime(700, now + 0.08);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.08);
+
+            } else if (type === 'remove') {
+                // Return pop
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.08);
+
+            } else if (type === 'correct') {
+                // Train Whistle / Victory Arpeggio Tone
+                const frequencies = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                frequencies.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.09);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.09);
+                    osc.stop(now + idx * 0.09 + 0.25);
+                });
+
+            } else if (type === 'wrong') {
+                // Gentle warning buzz
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.setValueAtTime(140, now + 0.1);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+
+            } else if (type === 'arrived') {
+                // Grand celebration chime
+                const notes = [440, 554.37, 659.25, 880, 1108.73];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.5);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.12);
+                    osc.stop(now + idx * 0.12 + 0.5);
+                });
+            }
+        }
+
+        /**
+         * Toggle Audio Sound
+         */
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const text = document.getElementById('soundText');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-yellow-300';
+                text.innerText = 'Sound ON';
+                playSound('click');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-300';
+                text.innerText = 'Sound OFF';
+            }
+        }
+
+        /**
+         * Stopwatch Control Functions
+         */
+        function startTimer() {
+            stopTimer();
+            elapsedSeconds = 0;
+            updateTimerDisplay();
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(elapsedSeconds / 60);
+            const secs = elapsedSeconds % 60;
+            const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').innerText = formatted;
+            document.getElementById('finalTimeDisplay').innerText = formatted;
+        }
+
+        /**
+         * Utility: Shuffle Array randomly (Fisher-Yates)
+         */
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        /**
+         * Start / Restart Game
+         */
+        function startGame() {
+            initAudio();
+            playSound('click');
+
+            // Hide Start & Finish screens, show Game screen
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('finishScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            // Randomize order of 10 sentences for this session
+            sentenceQueue = shuffleArray(ORIGINAL_SENTENCES);
+            currentSentenceIndex = 0;
+            gameActive = true;
+
+            // Start stopwatch
+            startTimer();
+
+            // Load first sentence
+            loadSentence(currentSentenceIndex);
+        }
+
+        /**
+         * Load sentence at specific station index
+         */
+        function loadSentence(index) {
+            currentSentenceText = sentenceQueue[index];
+            // Split sentence by spaces into word tokens (preserving punctuation)
+            originalWords = currentSentenceText.split(' ');
+            
+            // Create word card objects with unique IDs to handle duplicate words cleanly
+            const cardObjects = originalWords.map((wordText, idx) => ({
+                id: `card_${index}_${idx}_${Math.random().toString(36).substr(2, 4)}`,
+                text: wordText,
+                originalIdx: idx
+            }));
+
+            // Shuffle word cards independently for this sentence
+            // Ensure shuffled order isn't identical to the correct answer by chance
+            let shuffled = shuffleArray(cardObjects);
+            if (shuffled.length > 1 && shuffled.map(c => c.text).join(' ') === currentSentenceText) {
+                // If randomly identical, reverse it
+                shuffled.reverse();
+            }
+
+            shuffledCards = shuffled;
+            selectedTrainCards = [];
+
+            // Reset UI Feedback
+            hideFeedback();
+
+            // Update Station Info Bar
+            const stationNum = index + 1;
+            document.getElementById('stationProgressText').innerHTML = `<i class="fa-solid fa-train-subway text-emerald-600"></i> Station ${stationNum} of 10`;
+            document.getElementById('stationNameLabel').innerText = `Station #${stationNum}`;
+            
+            const progressPct = Math.round((stationNum / 10) * 100);
+            document.getElementById('progressBar').style.width = `${progressPct}%`;
+            document.getElementById('progressPercent').innerText = `${progressPct}%`;
+
+            // Render Train Slots & Shuffled Pool Cards
+            renderGameArea();
+        }
+
+        /**
+         * Render both Train Slots and Word Cards Pool
+         */
+        function renderGameArea() {
+            renderTrainSlots();
+            renderWordPool();
+            updatePlacedCount();
+        }
+
+        /**
+         * Render Train Carriage Slots
+         */
+        function renderTrainSlots() {
+            const container = document.getElementById('trainSlotsContainer');
+            
+            // Keep the Train Engine
+            const engineHTML = `
+                <div class="shrink-0 flex items-end mr-2 animate-train">
+                    <svg viewBox="0 0 100 80" class="w-16 h-14 drop-shadow">
+                        <rect x="20" y="20" width="70" height="40" fill="#2563eb" rx="6" />
+                        <rect x="65" y="5" width="25" height="55" fill="#dc2626" rx="4" />
+                        <rect x="70" y="12" width="15" height="18" fill="#fef08a" rx="2" />
+                        <rect x="30" y="8" width="10" height="15" fill="#e11d48" rx="2" />
+                        <circle cx="35" cy="62" r="10" fill="#1e293b" stroke="#cbd5e1" stroke-width="2" />
+                        <circle cx="75" cy="62" r="10" fill="#1e293b" stroke="#cbd5e1" stroke-width="2" />
+                        <circle cx="15" cy="35" r="5" fill="#facc15" />
+                    </svg>
+                </div>
+            `;
+
+            let slotsHTML = engineHTML;
+
+            const totalSlots = originalWords.length;
+
+            for (let i = 0; i < totalSlots; i++) {
+                const filledCard = selectedTrainCards[i];
+
+                if (filledCard) {
+                    // Filled slot carriage
+                    slotsHTML += `
+                        <div onclick="removeCardFromTrain('${filledCard.id}')" 
+                             class="word-card shrink-0 bg-amber-300 hover:bg-amber-400 border-2 border-amber-500 text-amber-950 font-black text-sm sm:text-base px-3.5 py-2.5 rounded-xl shadow-md cursor-pointer flex items-center justify-center min-w-[50px] relative group transform transition">
+                            <span>${escapeHTML(filledCard.text)}</span>
+                            <span class="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                <i class="fa-solid fa-xmark"></i>
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    // Empty slot carriage
+                    slotsHTML += `
+                        <div class="shrink-0 bg-white/50 border-2 border-dashed border-sky-400/80 text-sky-400 font-bold text-xs px-3 py-2.5 rounded-xl flex items-center justify-center min-w-[55px] h-[42px] select-none">
+                            <span class="opacity-60">${i + 1}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = slotsHTML;
+        }
+
+        /**
+         * Render Word Cards Pool
+         */
+        function renderWordPool() {
+            const container = document.getElementById('wordCardsContainer');
+            let poolHTML = '';
+
+            shuffledCards.forEach(card => {
+                const isSelected = selectedTrainCards.some(sc => sc.id === card.id);
+
+                if (isSelected) {
+                    // Selected state: placeholder / disabled style
+                    poolHTML += `
+                        <div class="bg-slate-100 border-2 border-slate-200 text-slate-300 font-extrabold text-sm sm:text-base px-4 py-2.5 rounded-xl opacity-40 cursor-not-allowed select-none">
+                            ${escapeHTML(card.text)}
+                        </div>
+                    `;
+                } else {
+                    // Available state
+                    poolHTML += `
+                        <button onclick="selectWordCard('${card.id}')" 
+                                class="word-card bg-white hover:bg-sky-50 border-2 border-sky-400 hover:border-sky-500 text-sky-950 font-black text-sm sm:text-base px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg active:scale-95 transition cursor-pointer">
+                            ${escapeHTML(card.text)}
+                        </button>
+                    `;
+                }
+            });
+
+            container.innerHTML = poolHTML;
+        }
+
+        /**
+         * Update Placed Words Counter
+         */
+        function updatePlacedCount() {
+            document.getElementById('wordsPlacedCount').innerText = selectedTrainCards.length;
+            document.getElementById('totalWordsCount').innerText = originalWords.length;
+        }
+
+        /**
+         * Select a word card from available pool
+         */
+        function selectWordCard(cardId) {
+            if (!gameActive) return;
+
+            // Check if card exists and isn't already placed
+            const cardObj = shuffledCards.find(c => c.id === cardId);
+            if (!cardObj) return;
+
+            if (selectedTrainCards.some(c => c.id === cardId)) return; // Prevent duplicate selection
+
+            playSound('click');
+
+            // Place in train
+            selectedTrainCards.push(cardObj);
+
+            // Re-render
+            renderGameArea();
+
+            // Automatically check answer if all slots filled!
+            if (selectedTrainCards.length === originalWords.length) {
+                checkAnswer();
+            } else {
+                hideFeedback();
+            }
+        }
+
+        /**
+         * Remove a placed word from train and send back to pool
+         */
+        function removeCardFromTrain(cardId) {
+            if (!gameActive) return;
+
+            const index = selectedTrainCards.findIndex(c => c.id === cardId);
+            if (index !== -1) {
+                playSound('remove');
+                selectedTrainCards.splice(index, 1);
+                hideFeedback();
+                renderGameArea();
+            }
+        }
+
+        /**
+         * Clear all slots for current sentence
+         */
+        function resetCurrentSentence() {
+            if (!gameActive || selectedTrainCards.length === 0) return;
+            playSound('remove');
+            selectedTrainCards = [];
+            hideFeedback();
+            renderGameArea();
+        }
+
+        /**
+         * Validate Answer
+         */
+        function checkAnswer() {
+            const userSentence = selectedTrainCards.map(c => c.text).join(' ');
+            
+            if (userSentence === currentSentenceText) {
+                // CORRECT ANSWER!
+                handleCorrectAnswer();
+            } else {
+                // INCORRECT ANSWER
+                handleIncorrectAnswer();
+            }
+        }
+
+        /**
+         * Handle Correct Answer
+         */
+        function handleCorrectAnswer() {
+            playSound('correct');
+            showFeedback('Great job! Choo Choo! 🚂✨', true);
+
+            // Animate train slots container
+            const container = document.getElementById('trainSlotsContainer');
+            container.classList.add('animate-bounce');
+
+            // Disable rapid double clicks
+            gameActive = false;
+
+            setTimeout(() => {
+                container.classList.remove('animate-bounce');
+                currentSentenceIndex++;
+
+                if (currentSentenceIndex < 10) {
+                    // Move to next station
+                    gameActive = true;
+                    loadSentence(currentSentenceIndex);
+                } else {
+                    // All 10 sentences completed!
+                    finishGame();
+                }
+            }, 1300);
+        }
+
+        /**
+         * Handle Incorrect Answer
+         */
+        function handleIncorrectAnswer() {
+            playSound('wrong');
+            showFeedback('Not quite! Try again! 💡', false);
+
+            // Shake train container visually
+            const container = document.getElementById('trainSlotsContainer');
+            container.classList.add('animate-shake');
+            setTimeout(() => {
+                container.classList.remove('animate-shake');
+            }, 500);
+        }
+
+        /**
+         * Feedback Badge Helper
+         */
+        function showFeedback(message, isSuccess) {
+            const badge = document.getElementById('feedbackBadge');
+            badge.innerText = message;
+            badge.classList.remove('hidden', 'bg-emerald-500', 'bg-rose-500', 'text-white');
+            if (isSuccess) {
+                badge.classList.add('bg-emerald-500', 'text-white', 'animate-pulse');
+            } else {
+                badge.classList.add('bg-rose-500', 'text-white');
+            }
+        }
+
+        function hideFeedback() {
+            const badge = document.getElementById('feedbackBadge');
+            badge.classList.add('hidden');
+        }
+
+        /**
+         * Finish Game Routine
+         */
+        function finishGame() {
+            stopTimer();
+            gameActive = false;
+
+            playSound('arrived');
+
+            // Hide Game screen, show Finish screen
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('finishScreen').classList.remove('hidden');
+
+            // Trigger Confetti Celebration
+            startConfetti();
+        }
+
+        /**
+         * Simple Lightweight Canvas Confetti Engine
+         */
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            const pieces = [];
+            const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+            for (let i = 0; i < 80; i++) {
+                pieces.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedY: Math.random() * 3 + 2,
+                    speedX: Math.random() * 2 - 1,
+                    rotation: Math.random() * 360,
+                    rotSpeed: Math.random() * 6 - 3
+                });
+            }
+
+            let animationFrame;
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                pieces.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    p.rotation += p.rotSpeed;
+
+                    if (p.y < canvas.height) alive = true;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (alive) {
+                    animationFrame = requestAnimationFrame(render);
+                }
+            }
+
+            render();
+        }
+
+        /**
+         * HTML Escape Helper
+         */
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
